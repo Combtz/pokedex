@@ -8,16 +8,6 @@ import (
 	"net/http"
 )
 
-type LocationData struct {
-	Count    int    `json:"count"`
-	Next     string `json:"next"`
-	Previous string `json:"previous"`
-	Results  []struct {
-		Name string `json:"name"`
-		URL  string `json:"url"`
-	} `json:"results"`
-}
-
 func GetLocationAreaJSON(url string) (LocationData, error) {
 	res, err := http.Get(url)
 	if err != nil {
