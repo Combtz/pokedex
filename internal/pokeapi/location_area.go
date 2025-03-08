@@ -2,30 +2,40 @@ package pokeapi
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
 	"io"
 	"net/http"
 )
 
-func GetLocationAreaJSON(url string) (LocationData, error) {
-	res, err := http.Get(url)
+func (c *Client) GetLocationAreaJSON(url string) (LocationData, error) {
+	if val, ok := c.cache.Get(url); ok {
+		locationResp := LocationData{}
+		err := json.Unmarshal(val, &locationResp)
+		if err != nil {
+			return LocationData{}, err
+		}
+		return locationResp, nil
+	}
+
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return LocationData{}, err
 	}
-	defer res.Body.Close()
-	body, err := io.ReadAll(res.Body)
+
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return LocationData{}, err
 	}
-	if res.StatusCode > 299 {
-		errMes := fmt.Sprintf("Response failed with status code: %d and\nbody: %s\n", res.StatusCode, body)
-		return LocationData{}, errors.New(errMes)
-	}
-	var locationData LocationData
-	err = json.Unmarshal(body, &locationData)
+	defer resp.Body.Close()
+
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return LocationData{}, err
 	}
-	return locationData, nil
+	locationResp := LocationData{}
+	err = json.Unmarshal(data, &locationResp)
+	if err != nil {
+		return LocationData{}, err
+	}
+	c.cache.Add(url, data)
+	return locationResp, nil
 }

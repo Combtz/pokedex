@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/Combtz/pokedex/internal/pokeapi"
 )
 
 func commandMap(c *config) error {
+	url := "https://pokeapi.co/api/v2/location-area/"
+
 	if c.next == "" {
-		data, err := pokeapi.GetLocationAreaJSON("https://pokeapi.co/api/v2/location-area/")
+		data, err := c.pokeapiClient.GetLocationAreaJSON(url)
 		if err != nil {
 			return err
 		}
@@ -20,7 +20,7 @@ func commandMap(c *config) error {
 		}
 		return nil
 	}
-	data, err := pokeapi.GetLocationAreaJSON(c.next)
+	data, err := c.pokeapiClient.GetLocationAreaJSON(c.next)
 	if err != nil {
 		return err
 	}
@@ -37,7 +37,7 @@ func commandMapb(c *config) error {
 		fmt.Println("you're on the first page")
 		return nil
 	}
-	data, err := pokeapi.GetLocationAreaJSON(c.previous)
+	data, err := c.pokeapiClient.GetLocationAreaJSON(c.previous)
 	if err != nil {
 		return err
 	}
