@@ -21,6 +21,7 @@ func commandCatch(c *config, args ...string) error {
 	catchChance := 1.0 / (1.0 + float64(data.BaseExperience)/100.0)
 	if chance < float64(catchChance) {
 		fmt.Println(args[0] + " was caught!")
+		c.caughtPokemon[args[0]] = data
 	} else {
 		fmt.Println(args[0] + " escaped!")
 	}
